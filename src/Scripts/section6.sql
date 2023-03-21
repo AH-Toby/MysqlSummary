@@ -1,34 +1,4 @@
-# DQL(四)
-
-## 一.子查询
-
-### 1.解释
-
-当一个查询语句中又**嵌套了另一个完整的select语句**，则被嵌套的select语句称为子查询或内查询，外面的select语句称为主查询或外查询。
-
-### 2.分类
-
-按子查询出现的位置进行分类：
-
-| 分类                | 要求                                                         |
-| ------------------- | ------------------------------------------------------------ |
-| select后面          | 子查询的结果为单行单列（标量子查询）                         |
-| from后面            | 子查询的结果可以为多行多列                                   |
-| where或having后面 ★ | 子查询的结果必须为单列<br/>		单行子查询<br/>		多行子查询 |
-| exists后面          | 子查询结果必须为单列（相关子查询）                           |
-
-### 3.特点
-1.子查询放在条件中,**要求必须放在条件的右侧**
-2.子查询一般放在小括号中
-3.子查询的执行优先于主查询
-4.单行子查询对应了 单行操作符：> < >= <= = <>
-   多行子查询对应了 多行操作符：any/some  all in   
-
-### 4.单行子查询
-
-示例：
-
-```sql
+# 一.子查询
 # 1.单行子查询
 # 谁的工资比 Abel 高?
 SELECT last_name AS "姓名",
@@ -74,21 +44,8 @@ HAVING MIN(salary) > (
 	FROM employees
 	WHERE department_id = 50
 );
-```
 
-### 5.多行子查询
-
-#### 5.1.多行操作符：
-
-| 操作符   | 作用                               | 示例                                                         |
-| -------- | ---------------------------------- | ------------------------------------------------------------ |
-| in       | 判断某字段是否在指定列表内         | x in(10,30,50)                                               |
-| any/some | 判断某字段的值是否满足其中任意一个 | x>any(10,30,50)<br/>x>min()<br /><br />x=any(10,30,50)<br/>x in(10,30,50) |
-| all      | 判断某字段的值是否满足里面所有的   | x >all(10,30,50)<br/>x >max()                                |
-
-示例：
-
-```sql
+# 5.多行查询
 # 返回location_id是1400或1700的部门中的所有员工姓名
 SELECT last_name AS "员工姓名"
 FROM employees
@@ -145,15 +102,9 @@ WHERE salary < (
 	  FROM employees
 	  WHERE job_id = 'IT_PROG'
 );
-```
 
-### 6.子查询在不同位置
-
-#### 6.1.where后面
-
-示例：
-
-```sql
+# 8.子查询在不同的位置
+# where后面
 # 谁的工资比 Abel 高?
 SELECT *
 FROM employees
@@ -162,13 +113,8 @@ WHERE salary > (
 	FROM employees
 	WHERE last_name = 'Abel'
 );
-```
 
-#### 6.2.having后面
-
-示例：
-
-```sql
+# having后面
 # 查询最低工资大于50号部门最低工资 的部门id和其最低工资
 SELECT department_id AS "部门id",
 		MIN(salary) AS "最低工资"
@@ -179,13 +125,8 @@ HAVING MIN(salary) > (
 	FROM employees
 	WHERE department_id = 50
 );
-```
 
-#### 6.3.select之后
-
-示例：
-
- ```sql
+# SELECT 之后
 # 查询部门编号是50的员工个数
 SELECT (
 	SELECT COUNT(*) 
@@ -197,13 +138,8 @@ SELECT (
 SELECT COUNT(*) 
 FROM employees
 WHERE department_id = 50;
- ```
 
-#### 6.4.放在from之后
-
-示例：
-
-```sql
+# FROM之后
 # 查询每个部门的平均工资的工资级别
 
 # 解题思路
@@ -222,13 +158,8 @@ INNER JOIN (
 	 FROM employees
      GROUP BY department_id
 ) AS avg_salary ON avg_salary.sal BETWEEN min_salary AND max_salary;
-```
 
-#### 6.5.放在exists后面
-
-示例：
-
-```sql
+# exists之后
 # 查询有无名字叫“张三丰”的员工信息
 SELECT EXISTS(
 	SELECT * 
@@ -259,13 +190,9 @@ WHERE NOT EXISTS  (
 	FROM beauty girl
 	WHERE boy.id = girl.boyfriend_id 
 );
-```
 
-### 7.综合案例
-
-示例：
-
-```sql
+# 9.综合案例
+USE myemployees;
 # 查询和 Zlotkey 相同部门的员工姓名和工资
 SELECT last_name AS "姓名",
 	    salary AS "工资"
@@ -285,66 +212,8 @@ WHERE salary > (
 	SELECT AVG(salary)
 	FROM employees
 );
-```
 
-## 二.分页查询
-
-### 1.解释
-
-**应用场景:** 当页面上的数据，一页显示不全，则需要分页显示
-
-分页查询的sql命令请求数据库服务器——>服务器响应查询到的多条数据——>前台页面
-
-### 2.语法
-
-```sql
-select 查询列表
-from 表1 别名
-join 表2 别名
-on 连接条件
-where 筛选条件
-group by 分组
-having 分组后筛选
-order by 排序列表
-limit 起始条目索引,显示的条目数
-```
-
-### 3.执行顺序
-
-①from子句
-②join子句
-③on子句
-④where子句
-⑤group by子句
-⑥having子句
-⑦select子句
-⑧order by子句
-⑨limit子句
-
-### 4.特点
-
-> 1.起始条目索引如果不写，默认是0
-> 2.limit后面支持两个参数。参数1：显示的起始条目索引， 参数2：条目数
-
-### 5.公式
-
-假如要显示的页数是page，每页显示的条目数为size
-
-```sql
-select *
-from employees
-limit (page-1)*size,size;
-
-page	size=10
-1     limit 0,10
-2			limit 10,10
-3			limit 20,10
-4			limit 30,10
-```
-
-示例：
-
-```sql
+# 二.分页查询
 # 1.查询员工信息表的前5条
 SELECT *
 FROM employees
@@ -361,29 +230,8 @@ LIMIT 0,5;
  WHERE commission_pct IS NOT NULL
  ORDER BY salary
  LIMIT 10,10;
-```
 
-## 三.联合查询
-
-### 1.解释
-
-当查询结果来自于多张表，但多张表之间没有关联，这个时候往往使用联合查询，也称为union查询
-
-### 2.语法
-
-```sql
-select 查询列表 from 表1  where 筛选条件  
-	union
-select 查询列表 from 表2  where 筛选条件  
-```
-
-### 3.特点
-
-> 1.多条待联合的查询语句的查询列数必须一致，查询类型、字段意义最好一致
-> 2.union实现去重查询
->    union all 实现全部查询，包含重复项
-
-```sql
+# 三.联合查询
 # 1.查询所有国家的年龄>20岁的用户信息
 SELECT * FROM usa WHERE uage >20 UNION
 SELECT * FROM chinese WHERE age >20 ;
@@ -401,5 +249,4 @@ UNION  ALL
 SELECT 1,'范冰冰' 
 UNION  ALL
 SELECT 1,'范冰冰' ;
-```
 

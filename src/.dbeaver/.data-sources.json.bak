@@ -1,0 +1,31 @@
+{
+	"folders": {},
+	"connections": {
+		"mysql8-186d9b310a6-212dee6a77079a6e": {
+			"provider": "mysql",
+			"driver": "mysql8",
+			"name": "myemployees",
+			"save-password": true,
+			"configuration": {
+				"host": "192.168.65.150",
+				"port": "3306",
+				"database": "myemployees",
+				"url": "jdbc:mysql://192.168.65.150:3306/myemployees",
+				"configurationType": "MANUAL",
+				"type": "dev",
+				"auth-model": "native"
+			}
+		}
+	},
+	"connection-types": {
+		"dev": {
+			"name": "开发",
+			"color": "255,255,255",
+			"description": "常规开发数据库",
+			"auto-commit": true,
+			"confirm-execute": false,
+			"confirm-data-change": false,
+			"auto-close-transactions": false
+		}
+	}
+}
